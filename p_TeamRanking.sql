@@ -81,6 +81,40 @@ dbms_output.put_line('##########################################################
 dbms_output.put_line('  ');
 dbms_output.put_line('#############################################################################################');
 
+
+    --LOOP for Top3 in Western Conference
+    dbms_output.put_line('  ');
+    dbms_output.put_line('Top 3 Western Confernce Leaders');
+    dbms_output.put_line('  ');
+    dbms_output.put_line('Division    '||'  TEAM NAME    '|| 'Games Played   '|| 'Games Won  ' || '% Games Won');
+    dbms_output.put_line('  ');
+    FOR TOP3_VAL_EAST IN
+    (SELECT       *
+    FROM
+      (SELECT conference_id,
+        conference_name,
+        season_id,
+        division_id,
+        division_name,
+        team_id,
+        team_name,
+        game_played,
+        winning_count,
+        pct_win,
+        row_number() over (partition BY division_id order by pct_win DESC)rn
+      FROM ranking_view
+      )
+    WHERE season_id   = sea_id
+    AND conference_id = 2
+    AND rn            < 4
+    ORDER BY division_id
+    )
+    LOOP
+      dbms_output.put_line(TOP3_VAL_EAST.division_name||'   '||TOP3_VAL_EAST.team_name||'         '||TOP3_VAL_EAST.game_played||'         '||TOP3_VAL_EAST.winning_count||'            '||TOP3_VAL_EAST.pct_win||'%');
+    END LOOP;
+dbms_output.put_line('  ');
+dbms_output.put_line('########################### END     OF     REPORT ###############################');
+
 EXCEPTION
 WHEN no_data_found THEN
 dbms_output.put_line('Sorry, there is no regular season played in '||Year_season||'!');
